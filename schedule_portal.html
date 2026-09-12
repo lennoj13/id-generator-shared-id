@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COLIN ROSKOS - Fall 2026 Academic Schedule Demo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mnsu: {
+                            purple: '#49306E',
+                            darkPurple: '#362154',
+                            deepPurple: '#27153E',
+                            gold: '#FEBD11',
+                            lightGold: '#FFD359',
+                            softGold: '#FFF9E8',
+                            grayBg: '#F3F5F8',
+                            slateBorder: '#E2E8F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F3F7;
+        }
+
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Custom Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #49306E;
+        }
+
+        /* Print & PDF Export Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .schedule-paper {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            #studentScheduleSheet {
+                display: none !important;
+            }
+            #pdfDocument {
+                display: block !important;
+            }
+            .print-border {
+                border: 2px solid #49306E !important;
+                padding: 20px !important;
+                border-radius: 8px !important;
+            }
+            table {
+                font-size: 10px !important;
+            }
+            .page-break-before {
+                page-break-before: always;
+            }
+            .print-only {
+                display: block !important;
+            }
+
+            #profileCardDocument {
+                display: none !important;
+            }
+
+            body.printing-profile #studentScheduleSheet,
+            body.printing-profile #pdfDocument,
+            body.printing-profile .no-print,
+            body.printing-profile footer {
+                display: none !important;
+            }
+
+            body.printing-profile #profileCardDocument {
+                display: block !important;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        #pdfDocument {
+            display: none;
+        }
+
+        #profileCardDocument {
+            display: none;
+        }
+
+        .profile-card {
+            width: 72mm;
+            min-height: 112mm;
+            margin: 18mm auto;
+            border: 3px solid #49306e;
+            border-top: 9px solid #febd11;
+            padding: 5mm;
+            background: #ffffff;
+            color: #172033;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .profile-card-header {
+            background: #49306e;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            margin: -5mm -5mm 0;
+            padding: 3mm 5mm;
+            text-transform: uppercase;
+        }
+
+        .profile-card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3mm;
+            margin-top: 5mm;
+        }
+
+        .profile-card-photo {
+            width: 35mm;
+            height: 43mm;
+            border: 2px solid #febd11;
+            object-fit: cover;
+        }
+
+        .profile-card-name {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.25;
+            text-transform: uppercase;
+        }
+
+        .profile-card-detail {
+            color: #334155;
+            font-size: 8px;
+            line-height: 1.55;
+        }
+
+        .profile-card-qr {
+            width: 24mm;
+            height: 24mm;
+            margin: 4mm auto 0;
+            border: 1px solid #cbd5e1;
+            object-fit: contain;
+        }
+
+        .profile-card-warning {
+            border-top: 1px solid #cbd5e1;
+            color: #64748b;
+            font-size: 7px;
+            margin-top: 3mm;
+            padding-top: 2mm;
+            text-transform: uppercase;
+        }
+
+        .profile-card-tag {
+            color: #49306e;
+            font-size: 8px;
+            font-weight: 700;
+            margin-top: 2mm;
+            text-transform: uppercase;
+        }
+
+        .pdf-page {
+            width: 100%;
+            max-width: 210mm;
+            margin: 0 auto;
+            color: #172033;
+            font-family: Arial, sans-serif;
+        }
+
+        .pdf-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            border-bottom: 3px solid #49306E;
+            padding-bottom: 14px;
+        }
+
+        .pdf-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .pdf-brand img {
+            width: 180px;
+            height: auto;
+        }
+
+        .pdf-kicker {
+            margin: 0 0 4px;
+            color: #49306E;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .pdf-title {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.15;
+            text-transform: uppercase;
+        }
+
+        .pdf-subtitle {
+            margin: 5px 0 0;
+            color: #475569;
+            font-size: 10px;
+        }
+
+        .pdf-document-label {
+            border: 1px solid #49306E;
+            color: #49306E;
+            padding: 8px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .pdf-section-title {
+            margin: 20px 0 8px;
+            border-bottom: 1px solid #cbd5e1;
+            color: #49306E;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .pdf-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px 18px;
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+        }
+
+        .pdf-meta-item span {
+            display: block;
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        .pdf-meta-item strong {
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+        }
+
+        .pdf-table th {
+            background: #49306E;
+            color: #fff;
+            font-size: 8px;
+            padding: 7px 6px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .pdf-table td {
+            border: 1px solid #cbd5e1;
+            padding: 7px 6px;
+            vertical-align: top;
+        }
+
+        .pdf-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .pdf-footer {
+            border-top: 1px solid #cbd5e1;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 22px;
+            padding-top: 8px;
+            font-size: 9px;
+        }
+
+        /* Keep the screen presentation close to a formal student record. */
+        body {
+            background: #eef1f4;
+            color: #172033;
+        }
+
+        .institutional-record {
+            border: 1px solid #9aa7b5 !important;
+            border-radius: 0 !important;
+            box-shadow: 0 8px 20px rgba(23, 32, 51, .08) !important;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .record-value {
+            color: #111827;
+            font-size: .92rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .record-label {
+            color: #4b5563;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .student-email-value {
+            white-space: nowrap;
+            word-break: normal;
+            font-size: .86rem;
+        }
+
+        .payment-value {
+            font-size: .86rem;
+            font-weight: 700;
+        }
+
+        .record-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .student-side-card {
+            position: sticky;
+            top: 1rem;
+        }
+
+        @media (max-width: 1023px) {
+            .record-layout { grid-template-columns: 1fr; }
+            .student-side-card { position: static; }
+        }
+
+        #studentScheduleSheet > .print-only { order: 0; }
+        #studentScheduleSheet > div.border-b-2 { order: 1; }
+        #studentScheduleSheet > section[aria-label="Student and payment information"] { order: 2; }
+        #weeklyGridSection { order: 3; }
+        #courseListSection { order: 4; }
+        #studentScheduleSheet > div.border-t-2 { order: 5; }
+
+        @media (min-width: 768px) {
+            #studentScheduleSheet { padding: 1.25rem !important; }
+        }
+
+        @media (max-width: 640px) {
+            .record-value { font-size: .92rem; }
+        }
+
+        /* Compact institutional schedule grid. */
+        #studentScheduleSheet {
+            gap: .55rem !important;
+        }
+
+        #weeklyGridSection {
+            gap: .4rem !important;
+        }
+
+        #weeklyGridSection > div:first-child {
+            margin-bottom: .25rem;
+        }
+
+        #weeklyGridSection table {
+            font-size: 10px !important;
+        }
+
+        #weeklyGridSection thead th {
+            background: #49306e !important;
+            border-color: #362154 !important;
+            padding: 5px 4px !important;
+            font-size: 9px !important;
+        }
+
+        #weeklyGridSection tbody tr {
+            height: 42px !important;
+        }
+
+        #weeklyGridSection tbody td {
+            padding: 3px !important;
+            border-color: #d7dce3 !important;
+        }
+
+        #weeklyGridSection tbody td:first-child {
+            background: #f4f5f7 !important;
+            color: #374151 !important;
+            font-size: 9px !important;
+            width: 78px;
+        }
+
+        #weeklyGridSection tbody td > div {
+            background: #f8f7fb !important;
+            border-left: 3px solid #49306e !important;
+            border-radius: 0 !important;
+            padding: 4px !important;
+        }
+
+        #weeklyGridSection tbody td > div span,
+        #weeklyGridSection tbody td > div p {
+            color: #252036 !important;
+        }
+
+        #weeklyGridSection tbody td > div span[class*="bg-"] {
+            background: #e8e3f1 !important;
+            color: #49306e !important;
+            font-size: 8px !important;
+        }
+
+        #weeklyGridSection tbody td > div p {
+            margin-top: 2px !important;
+            line-height: 1.15 !important;
+        }
+
+        #weeklyGridSection tbody td > div p:nth-of-type(1) {
+            font-size: 9px !important;
+        }
+
+        #weeklyGridSection tbody td > div p:nth-of-type(2) {
+            font-size: 8px !important;
+        }
+
+        .student-side-card {
+            border-top: 3px solid #49306e !important;
+            border-radius: 0 !important;
+            box-shadow: 0 4px 12px rgba(23, 32, 51, .06) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Top State System Bar -->
+    <div class="no-print portal-chrome bg-mnsu-deepPurple text-white text-xs py-1.5 px-4 border-b-2 border-mnsu-gold shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 text-[11px]">
+                <span class="bg-mnsu-gold text-mnsu-deepPurple font-black px-2 py-0.5 rounded text-[10px] uppercase tracking-wider">
+                    Minnesota State System
+                </span>
+                <span class="font-medium text-slate-200">Minnesota State University, Mankato &bull; E-Services Portal</span>
+            </div>
+            <div class="flex items-center space-x-4 text-[11px] text-slate-300">
+                <span><i class="fa-regular fa-clock text-mnsu-gold mr-1"></i> Term: <strong class="text-white">Fall 2026</strong></span>
+                <span class="text-slate-600">|</span>
+                <span>StarID: <strong class="font-mono text-mnsu-lightGold">cr4827rx</strong></span>
+                <span class="text-slate-600">|</span>
+                <a href="#" onclick="alert('Session signed out.')" class="hover:text-mnsu-gold text-slate-300">Sign Out</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student schedule navigation header -->
+    <header class="no-print portal-chrome bg-white border-b border-slate-200 shadow-xs sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            
+            <!-- Institutional web header -->
+            <div class="flex items-center space-x-3 min-w-0">
+                <img src="image.png" alt="Minnesota State University, Mankato" class="h-11 sm:h-12 w-auto object-contain">
+                <div class="border-l-2 border-slate-200 pl-3 min-w-0">
+                    <h1 class="text-sm sm:text-base font-black text-mnsu-purple uppercase tracking-tight font-display leading-tight">Minnesota State University, Mankato</h1>
+                    <p class="text-[11px] text-slate-500">Office of the Registrar &bull; Student Course Registration</p>
+                </div>
+            </div>
+
+            <!-- Student Profile Badge & PDF Export Button -->
+            <div class="flex items-center gap-3 flex-wrap justify-end">
+                <div class="text-right text-xs">
+                    <p class="font-bold text-slate-900 leading-tight uppercase">COLIN ROSKOS</p>
+                    <p class="text-[11px] text-slate-500 font-mono">StarID: <span class="font-bold text-mnsu-purple">cr4827rx</span> &bull; Tech ID: <span class="font-bold text-slate-800">10384726</span></p>
+                </div>
+                
+            </div>
+
+        </div>
+
+        <!-- Portal Sub-Nav Tabs -->
+        <div class="bg-slate-800 text-slate-300 text-xs font-medium border-t border-slate-700">
+            <div class="max-w-7xl mx-auto px-4 flex items-center space-x-1 overflow-x-auto custom-scrollbar">
+                <a href="#" class="px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition">Dashboard</a>
+                <a href="#" class="px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition">Courses &amp; Registration</a>
+                <a href="#" class="px-3 py-2 bg-mnsu-purple text-mnsu-gold font-bold border-b-2 border-mnsu-gold transition whitespace-nowrap">View Schedule (Active)</a>
+                <a href="#" class="px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">D2L Brightspace</a>
+                <a href="#" class="px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">Grades &amp; Transcripts</a>
+                <a href="#" class="px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition whitespace-nowrap">Financial Aid &amp; Billing</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-3 flex-grow w-full space-y-3">
+
+        <!-- Controls Toolbar (Term & Major Selector + PDF Action) -->
+        <div class="no-print portal-chrome bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
+                
+                <!-- Term Selection -->
+                <div class="md:col-span-4 flex items-center gap-2">
+                    <label class="text-[10px] font-bold text-slate-700 whitespace-nowrap">Academic Term:</label>
+                    <select id="termSelector" class="min-w-0 flex-1 text-[11px] font-semibold border border-slate-300 rounded-lg px-2 py-1.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-mnsu-purple text-slate-800">
+                        <option value="fall2026" selected>Fall Semester 2026 (Aug 24, 2026 - Dec 11, 2026)</option>
+                        <option value="spring2027">Spring Semester 2027 (Jan 11, 2027 - May 07, 2027)</option>
+                        <option value="fall2025">Fall Semester 2025 (Historical Record)</option>
+                    </select>
+                </div>
+
+                <!-- Major / Program Filter -->
+                <div class="md:col-span-5 flex items-center gap-2">
+                    <label class="text-[10px] font-bold text-slate-700 whitespace-nowrap">Degree Program:</label>
+                    <select id="majorSelector" onchange="changeDegreeProgram()" class="min-w-0 flex-1 text-[11px] font-semibold border border-slate-300 rounded-lg px-2 py-1.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-mnsu-purple text-slate-800">
+                        <option value="swe" selected>B.S. Computer Engineering (College of Science, Eng &amp; Tech)</option>
+                        <option value="cs">B.S. Computer Science (CSET)</option>
+                        <option value="cit">B.S. Computer Information Technology (CIT - CSET)</option>
+                        <option value="me">B.S. Mechanical Engineering (CSET)</option>
+                        <option value="nurs">B.S. Nursing (College of Allied Health &amp; Nursing)</option>
+                        <option value="av">B.S. Aviation - Professional Flight (CSET)</option>
+                        <option value="acct">B.S. Accounting (College of Business)</option>
+                    </select>
+                </div>
+
+                <!-- View Switcher & PDF Download -->
+                <div class="md:col-span-3 text-right flex md:justify-end items-center gap-2">
+                    <div class="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-xs w-full md:w-auto justify-center">
+                        <button id="btnScheduleGrid" onclick="toggleView('grid')" class="px-2.5 py-1 rounded-md font-bold transition bg-mnsu-purple text-white shadow-xs">
+                            <i class="fa-regular fa-calendar-days mr-1"></i> Weekly Grid
+                        </button>
+                        <button id="btnScheduleList" onclick="toggleView('list')" class="px-2.5 py-1 rounded-md font-semibold transition text-slate-600 hover:text-mnsu-purple">
+                            <i class="fa-solid fa-list-ul mr-1"></i> List View
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- ENROLLMENT & CLASS SCHEDULE PREVIEW                                      -->
+        <!-- This page is not an institutional certificate or official record.        -->
+        <!-- ========================================================================= -->
+        <div class="record-layout">
+        <div id="studentScheduleSheet" class="schedule-paper institutional-record print-border bg-white rounded-2xl border-2 border-slate-300 shadow-md p-3 sm:p-4 space-y-3">
+
+            <div class="print-only border-2 border-amber-500 bg-amber-50 text-amber-900 rounded-lg px-3 py-2 text-center text-[10px] font-bold uppercase tracking-wide">
+                STUDENT RECORD REFERENCE — VERIFY AGAINST THE UNIVERSITY REGISTRAR'S SYSTEM
+            </div>
+            
+            <!-- Institutional Header with Real MNSU Logo & Registrar Metadata -->
+            <div class="border-b-2 border-mnsu-purple pb-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+                
+                <!-- Schedule document heading -->
+                <div class="flex items-center space-x-4">
+                    <div>
+                        <p class="text-xs font-black text-mnsu-purple uppercase tracking-tight">STUDENT: COLIN ROSKOS</p>
+                        <p class="text-[11px] font-bold text-slate-800">ENROLLMENT VERIFICATION AND CLASS SCHEDULE <span class="font-normal text-slate-500" id="headerCollegeName">&bull; College of Science, Engineering &amp; Technology (CSET)</span></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- SECTION 1: WEEKLY CLASS SCHEDULE MATRIX (M-F Weekly Grid)      -->
+            <!-- ============================================================== -->
+            <div id="weeklyGridSection" class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fa-regular fa-clock text-mnsu-purple"></i> Weekly Class Schedule Matrix (Mankato Campus Time)
+                    </h3>
+                    <span class="text-[11px] text-slate-500 font-medium">Term Dates: August 24, 2026 – December 11, 2026</span>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-xs border-collapse min-w-[720px]">
+                        <thead>
+                            <tr class="bg-mnsu-purple text-white font-bold text-center text-[11px] uppercase tracking-wider">
+                                <th class="p-2.5 border-r border-mnsu-darkPurple w-24">TIME</th>
+                                <th class="p-2.5 border-r border-mnsu-darkPurple">MONDAY</th>
+                                <th class="p-2.5 border-r border-mnsu-darkPurple">TUESDAY</th>
+                                <th class="p-2.5 border-r border-mnsu-darkPurple">WEDNESDAY</th>
+                                <th class="p-2.5 border-r border-mnsu-darkPurple">THURSDAY</th>
+                                <th class="p-2.5">FRIDAY</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700 bg-white" id="weeklyGridBody">
+                            
+                            <!-- 18:00 - 19:00 -->
+                            <tr class="h-16">
+                                <td class="p-2 text-center font-mono font-bold bg-slate-50 border-r border-slate-200 text-[11px]">18:00 - 19:00</td>
+                                <!-- Monday: CIS 420 -->
+                                <td class="p-1.5 border-r border-slate-200" rowspan="3">
+                                    <div onclick="showCourseInfo('CIS 420')" class="h-full bg-amber-500/10 border-l-4 border-amber-600 p-2 rounded-r hover:bg-amber-500/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-amber-900 text-xs">CIS 420-01</span>
+                                            <span class="bg-amber-200 text-amber-900 text-[9px] font-bold px-1 rounded">In-Person</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">Enterprise Application Arch</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-location-dot text-amber-700 mr-0.5"></i> Wissink Hall 210</p>
+                                        <p class="text-[9px] text-slate-500">18:00 - 21:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                                <!-- Tuesday: CIS 455 -->
+                                <td class="p-1.5 border-r border-slate-200" rowspan="2">
+                                    <div onclick="showCourseInfo('CIS 455')" class="h-full bg-mnsu-purple/10 border-l-4 border-mnsu-purple p-2 rounded-r hover:bg-mnsu-purple/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-mnsu-purple text-xs">CIS 455-01</span>
+                                            <span class="bg-purple-200 text-mnsu-darkPurple text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">Software Quality &amp; Auditing</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-mnsu-purple mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">18:00 - 20:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                                <!-- Wednesday: CIS 455 -->
+                                <td class="p-1.5 border-r border-slate-200" rowspan="3">
+                                    <div onclick="showCourseInfo('CIS 455')" class="h-full bg-mnsu-purple/10 border-l-4 border-mnsu-purple p-2 rounded-r hover:bg-mnsu-purple/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-mnsu-purple text-xs">CIS 455-01</span>
+                                            <span class="bg-purple-200 text-mnsu-darkPurple text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">Software Quality &amp; Auditing</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-mnsu-purple mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">18:00 - 21:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                                <!-- Thursday: IT 440 -->
+                                <td class="p-1.5 border-r border-slate-200" rowspan="3">
+                                    <div onclick="showCourseInfo('IT 440')" class="h-full bg-blue-600/10 border-l-4 border-blue-700 p-2 rounded-r hover:bg-blue-600/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-blue-900 text-xs">IT 440-01</span>
+                                            <span class="bg-blue-200 text-blue-900 text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">IT Project Management</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-blue-700 mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">18:00 - 21:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                                <!-- Friday: CIS 420 -->
+                                <td class="p-1.5" rowspan="3">
+                                    <div onclick="showCourseInfo('CIS 420')" class="h-full bg-amber-500/10 border-l-4 border-amber-600 p-2 rounded-r hover:bg-amber-500/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-amber-900 text-xs">CIS 420-01</span>
+                                            <span class="bg-amber-200 text-amber-900 text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">Enterprise Application Arch</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-amber-700 mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">18:00 - 21:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 19:00 - 20:00 -->
+                            <tr class="h-16">
+                                <td class="p-2 text-center font-mono font-bold bg-slate-50 border-r border-slate-200 text-[11px]">19:00 - 20:00</td>
+                            </tr>
+
+                            <!-- 20:00 - 21:00 -->
+                            <tr class="h-16">
+                                <td class="p-2 text-center font-mono font-bold bg-slate-50 border-r border-slate-200 text-[11px]">20:00 - 21:00</td>
+                                <!-- Tuesday: IT 440 -->
+                                <td class="p-1.5 border-r border-slate-200" rowspan="2">
+                                    <div onclick="showCourseInfo('IT 440')" class="h-full bg-blue-600/10 border-l-4 border-blue-700 p-2 rounded-r hover:bg-blue-600/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-blue-900 text-xs">IT 440-01</span>
+                                            <span class="bg-blue-200 text-blue-900 text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">IT Project Management</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-blue-700 mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">20:00 - 22:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 21:00 - 22:00 -->
+                            <tr class="h-16">
+                                <td class="p-2 text-center font-mono font-bold bg-slate-50 border-r border-slate-200 text-[11px]">21:00 - 22:00</td>
+                                <td class="p-2 text-center text-slate-300 bg-slate-50/40 border-r border-slate-200">--</td>
+                                <td class="p-2 text-center text-slate-300 bg-slate-50/40 border-r border-slate-200">--</td>
+                                <!-- Thursday: CIS 485 -->
+                                <td class="p-1.5 border-r border-slate-200" rowspan="2">
+                                    <div onclick="showCourseInfo('CIS 485')" class="h-full bg-emerald-600/10 border-l-4 border-emerald-700 p-2 rounded-r hover:bg-emerald-600/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-emerald-900 text-xs">CIS 485-01</span>
+                                            <span class="bg-emerald-200 text-emerald-900 text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">Senior Software Architecture</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-emerald-700 mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">21:00 - 23:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                                <!-- Friday: CIS 485 -->
+                                <td class="p-1.5" rowspan="2">
+                                    <div onclick="showCourseInfo('CIS 485')" class="h-full bg-emerald-600/10 border-l-4 border-emerald-700 p-2 rounded-r hover:bg-emerald-600/20 cursor-pointer transition">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-extrabold text-emerald-900 text-xs">CIS 485-01</span>
+                                            <span class="bg-emerald-200 text-emerald-900 text-[9px] font-bold px-1 rounded">Online Sync</span>
+                                        </div>
+                                        <p class="font-bold text-slate-900 text-[11px] mt-0.5 leading-tight">Senior Software Architecture</p>
+                                        <p class="text-[10px] text-slate-600 mt-1"><i class="fa-solid fa-laptop text-emerald-700 mr-0.5"></i> Zoom Live MNSU</p>
+                                        <p class="text-[9px] text-slate-500">21:00 - 23:00 &bull; 4.0 Cr</p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 22:00 - 23:00 -->
+                            <tr class="h-16">
+                                <td class="p-2 text-center font-mono font-bold bg-slate-50 border-r border-slate-200 text-[11px]">22:00 - 23:00</td>
+                                <td class="p-2 text-center text-slate-300 bg-slate-50/40 border-r border-slate-200">--</td>
+                                <td class="p-2 text-center text-slate-300 bg-slate-50/40 border-r border-slate-200">--</td>
+                                <td class="p-2 text-center text-slate-300 bg-slate-50/40 border-r border-slate-200">--</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- SECTION 2: REGISTERED COURSE LIST TABLE (Authentic E-Services)  -->
+            <!-- ============================================================== -->
+            <div id="courseListSection" class="space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-mnsu-purple"></i> Registered Courses &bull; Registration Details
+                    </h3>
+                    <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                        Registered courses confirmed for Fall Semester 2026
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-xs border-collapse min-w-[780px]">
+                        <thead>
+                            <tr class="bg-slate-800 text-white font-bold text-[11px] uppercase tracking-wider">
+                                <th class="p-2.5 border-r border-slate-700 w-24">COURSE</th>
+                                <th class="p-2.5 border-r border-slate-700 w-20 text-center">CRN</th>
+                                <th class="p-2.5 border-r border-slate-700">TITLE</th>
+                                <th class="p-2.5 border-r border-slate-700 text-center w-16">CR.</th>
+                                <th class="p-2.5 border-r border-slate-700 w-44">DAYS &amp; TIMES</th>
+                                <th class="p-2.5 border-r border-slate-700 w-36">BUILDING &amp; ROOM</th>
+                                <th class="p-2.5 border-r border-slate-700 w-40">INSTRUCTOR</th>
+                                <th class="p-2.5 text-center w-24">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700 bg-white" id="courseListTableBody">
+                            
+                            <!-- Course 1 -->
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer" onclick="showCourseInfo('CIS 455')">
+                                <td class="p-2.5 font-bold font-mono text-mnsu-purple border-r border-slate-200">CIS 455-01</td>
+                                <td class="p-2.5 text-center font-mono text-slate-600 border-r border-slate-200">004892</td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-bold text-slate-900 hover:text-mnsu-purple">Software Quality Assurance &amp; Security Auditing</span>
+                                    <span class="text-[10px] text-slate-500 block">Grading: Regular Letter (A-F) &bull; Term: Fall 2026</span>
+                                </td>
+                                <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">4.0</td>
+                                <td class="p-2.5 border-r border-slate-200 font-medium">
+                                    <div>Tue 18:00 - 20:00</div>
+                                    <div>Wed 18:00 - 21:00</div>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-semibold text-slate-800">Online Zoom Live</span>
+                                    <span class="text-[10px] text-slate-500 block">Wissink Hall Sync</span>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200 text-slate-800">Dr. M. Lindholm</td>
+                                <td class="p-2.5 text-center">
+                                    <span class="bg-emerald-100 text-emerald-800 font-bold text-[10px] px-2 py-0.5 rounded">Enrolled</span>
+                                </td>
+                            </tr>
+
+                            <!-- Course 2 -->
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer" onclick="showCourseInfo('IT 440')">
+                                <td class="p-2.5 font-bold font-mono text-mnsu-purple border-r border-slate-200">IT 440-01</td>
+                                <td class="p-2.5 text-center font-mono text-slate-600 border-r border-slate-200">004895</td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-bold text-slate-900 hover:text-mnsu-purple">IT Project Management &amp; Agile Systems</span>
+                                    <span class="text-[10px] text-slate-500 block">Grading: Regular Letter (A-F) &bull; Term: Fall 2026</span>
+                                </td>
+                                <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">4.0</td>
+                                <td class="p-2.5 border-r border-slate-200 font-medium">
+                                    <div>Tue 20:00 - 22:00</div>
+                                    <div>Thu 18:00 - 21:00</div>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-semibold text-slate-800">Online Zoom Live</span>
+                                    <span class="text-[10px] text-slate-500 block">Trafton Science CSET</span>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200 text-slate-800">Dr. S. K. Johnson</td>
+                                <td class="p-2.5 text-center">
+                                    <span class="bg-emerald-100 text-emerald-800 font-bold text-[10px] px-2 py-0.5 rounded">Enrolled</span>
+                                </td>
+                            </tr>
+
+                            <!-- Course 3 -->
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer" onclick="showCourseInfo('CIS 420')">
+                                <td class="p-2.5 font-bold font-mono text-mnsu-purple border-r border-slate-200">CIS 420-01</td>
+                                <td class="p-2.5 text-center font-mono text-slate-600 border-r border-slate-200">004901</td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-bold text-slate-900 hover:text-mnsu-purple">Enterprise Application Architecture &amp; UI</span>
+                                    <span class="text-[10px] text-slate-500 block">Grading: Regular Letter (A-F) &bull; Term: Fall 2026</span>
+                                </td>
+                                <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">4.0</td>
+                                <td class="p-2.5 border-r border-slate-200 font-medium">
+                                    <div>Mon 18:00 - 21:00</div>
+                                    <div>Fri 18:00 - 21:00</div>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-semibold text-slate-800">Wissink Hall 210</span>
+                                    <span class="text-[10px] text-slate-500 block">Friday: Online Sync</span>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200 text-slate-800">Prof. R. Erickson</td>
+                                <td class="p-2.5 text-center">
+                                    <span class="bg-emerald-100 text-emerald-800 font-bold text-[10px] px-2 py-0.5 rounded">Enrolled</span>
+                                </td>
+                            </tr>
+
+                            <!-- Course 4 -->
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer" onclick="showCourseInfo('CIS 485')">
+                                <td class="p-2.5 font-bold font-mono text-mnsu-purple border-r border-slate-200">CIS 485-01</td>
+                                <td class="p-2.5 text-center font-mono text-slate-600 border-r border-slate-200">004918</td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-bold text-slate-900 hover:text-mnsu-purple">Senior Software Architecture &amp; Web Cloud</span>
+                                    <span class="text-[10px] text-slate-500 block">Grading: Regular Letter (A-F) &bull; Term: Fall 2026</span>
+                                </td>
+                                <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">4.0</td>
+                                <td class="p-2.5 border-r border-slate-200 font-medium">
+                                    <div>Thu 21:00 - 23:00</div>
+                                    <div>Fri 21:00 - 23:00</div>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200">
+                                    <span class="font-semibold text-slate-800">Online Zoom Live</span>
+                                    <span class="text-[10px] text-slate-500 block">Wissink Cloud Lab</span>
+                                </td>
+                                <td class="p-2.5 border-r border-slate-200 text-slate-800">Dr. D. F. Keefe</td>
+                                <td class="p-2.5 text-center">
+                                    <span class="bg-emerald-100 text-emerald-800 font-bold text-[10px] px-2 py-0.5 rounded">Enrolled</span>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Schedule card footer metadata for PDF -->
+            <div class="border-t-2 border-slate-200 pt-4 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                    <span class="font-bold text-slate-800">Student record reference</span>
+                    <span class="text-slate-300">&bull;</span>
+                    <span>Information shown for student record review</span>
+                </div>
+                <div class="font-mono text-slate-600 text-right">
+                    <div>Generated on: <strong class="text-slate-900" id="footerPrintedDate">September 7, 2026</strong></div>
+                    <div class="text-[10px] text-slate-400">Confirm with the Office of the Registrar for official certification</div>
+                </div>
+            </div>
+
+        </div>
+
+        <aside class="no-print student-side-card bg-white border border-slate-300 shadow-md p-4" aria-label="Student summary">
+            <div class="border-b-2 border-mnsu-purple pb-2 mb-3 text-sm font-black uppercase text-mnsu-purple">Student Record</div>
+            <div class="text-[11px] text-slate-700 space-y-1">
+                <p class="text-sm font-black text-slate-900 uppercase">COLIN ROSKOS</p>
+                <p>StarID: <strong class="font-mono text-mnsu-purple">cr4827rx</strong></p>
+                <p>Tech ID: <strong class="font-mono text-slate-900">10384726</strong></p>
+                <p class="break-all">Student Email: <strong class="text-slate-900">colin.roskos@mnsu.edu</strong></p>
+                <p>Enrollment ID: <strong class="font-mono text-slate-900">ENR-F26-10384726</strong></p>
+                <p>Major: <span class="font-semibold text-slate-900" id="studentMajorText">B.S. Computer Engineering</span></p>
+                <p>Academic Term: <strong class="text-mnsu-purple">Fall Semester 2026</strong></p>
+                <p>Enrollment Date: <strong class="text-slate-900">August 17, 2026</strong></p>
+                <p>Record Date: <strong class="text-slate-900" id="cardIssuedDate">September 7, 2026</strong></p>
+                <p>Status: <span class="text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.2 rounded text-[10px]" id="studentCreditBadge">Enrolled &bull; Full-Time (16.0 Credits)</span></p>
+                <p>Payment: <strong class="text-emerald-800">PAID IN FULL</strong></p>
+                <p>Total Paid: <strong class="text-slate-900">$6,480.00 USD</strong></p>
+            </div>
+        </aside>
+        </div>
+
+        <!-- Dedicated document layout used only when printing/saving as PDF. -->
+        <section id="pdfDocument" class="pdf-page" aria-label="Enrollment summary for printing">
+            <div class="pdf-header">
+                <div class="pdf-brand">
+                    <img src="image.png" alt="Minnesota State University, Mankato">
+                    <div>
+                        <p class="pdf-kicker">Student Records and Registration</p>
+                        <h1 class="pdf-title">Enrollment Summary</h1>
+                        <p class="pdf-subtitle">Class schedule and registered courses · Fall Semester 2026</p>
+                    </div>
+                </div>
+                <div class="pdf-document-label">Enrollment<br>Summary</div>
+            </div>
+
+            <h2 class="pdf-section-title">Student Information</h2>
+            <div class="pdf-meta">
+                <div class="pdf-meta-item"><span>Full Name</span><strong>COLIN ROSKOS</strong></div>
+                <div class="pdf-meta-item"><span>StarID</span><strong>cr4827rx</strong></div>
+                <div class="pdf-meta-item"><span>Tech ID</span><strong>10384726</strong></div>
+                <div class="pdf-meta-item"><span>Academic Program</span><strong id="pdfMajor">B.S. Computer Engineering</strong></div>
+                <div class="pdf-meta-item"><span>Enrollment Date</span><strong>August 17, 2026</strong></div>
+                <div class="pdf-meta-item"><span>Generated On</span><strong id="pdfGeneratedDate">September 7, 2026</strong></div>
+                <div class="pdf-meta-item"><span>Student Email</span><strong>colin.roskos@mnsu.edu</strong></div>
+                <div class="pdf-meta-item"><span>Enrollment ID</span><strong>ENR-F26-10384726</strong></div>
+                <div class="pdf-meta-item"><span>Payment Status</span><strong>PAID IN FULL - $6,480.00 USD</strong></div>
+                <div class="pdf-meta-item"><span>Total Credits</span><strong>16.0 Credits</strong></div>
+                <div class="pdf-meta-item"><span>Payment Reference</span><strong>PAY-F26-10384726</strong></div>
+            </div>
+
+            <h2 class="pdf-section-title">Registered Courses and Class Schedule</h2>
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>CRN</th>
+                        <th>Course Title</th>
+                        <th>Credits</th>
+                        <th>Days and Times</th>
+                        <th>Delivery / Location</th>
+                        <th>Instructor</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfCourseRows"></tbody>
+            </table>
+
+            <div class="pdf-footer">
+                <span>Enrollment summary for student records</span>
+                <span>Generated on <strong id="pdfFooterDate">September 7, 2026</strong></span>
+            </div>
+        </section>
+
+        <section id="profileCardDocument" class="profile-card" aria-label="Personal profile card">
+            <div class="profile-card-header">Student Profile Card</div>
+            <div class="profile-card-content">
+                <img class="profile-card-photo" src="foto.png" alt="Student profile photo">
+                <div>
+                    <div class="profile-card-name">Colin Roskos</div>
+                    <div class="profile-card-tag">Personal academic reference</div>
+                    <div class="profile-card-detail">
+                        Student Email: colin.roskos@mnsu.edu<br>
+                        StarID: cr4827rx<br>
+                        Tech ID: 10384726<br>
+                        Program: B.S. Computer Engineering<br>
+                        Term: Fall Semester 2026
+                    </div>
+                </div>
+            </div>
+            <img class="profile-card-qr" src="qr.png" alt="Personal demo QR code">
+            <div class="profile-card-warning">Personal reference card. Not an official university identification card.</div>
+        </section>
+
+        <div class="no-print flex justify-center pt-1">
+            <button onclick="downloadEnrollmentPdf()" class="bg-mnsu-purple hover:bg-mnsu-darkPurple text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition flex items-center gap-2 border border-mnsu-gold/40">
+                <i class="fa-solid fa-print text-mnsu-gold"></i>
+                <span>Print or Save PDF</span>
+            </button>
+            <button onclick="printProfileCard()" class="ml-3 bg-slate-700 hover:bg-slate-900 text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Print Personal Profile Card</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- University Clean Footer -->
+    <footer class="no-print bg-mnsu-deepPurple text-slate-300 text-xs py-6 mt-8 border-t-2 border-mnsu-gold">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <img src="image.png" alt="Minnesota State University, Mankato" class="h-8 w-auto brightness-200">
+                <p class="text-[11px] text-slate-400">
+                    &copy; 2026 Minnesota State University, Mankato &bull; A member of the Minnesota State system &bull; Equal Opportunity Educator.
+                </p>
+            </div>
+            <div class="text-right text-[11px] text-slate-400">
+                <span>Campus Hub &bull; Office of the Registrar: (507) 389-6266 &bull; IT Help Desk: (507) 389-6654</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Course Catalog Modal -->
+    <div id="courseModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden">
+            <div class="bg-mnsu-purple text-white px-5 py-3.5 flex justify-between items-center border-b-2 border-mnsu-gold">
+                <div>
+                    <span id="modalCode" class="bg-mnsu-gold text-mnsu-deepPurple text-[10px] font-black px-2 py-0.5 rounded font-mono">CIS 455</span>
+                    <h4 id="modalTitle" class="font-bold text-sm text-white mt-1">Software Quality Assurance</h4>
+                </div>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3 text-xs text-slate-700">
+                <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div>
+                        <span class="text-slate-500 font-semibold text-[10px] uppercase block">Instructor:</span>
+                        <span id="modalInstructor" class="font-bold text-slate-900">Dr. M. Lindholm</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 font-semibold text-[10px] uppercase block">Credits:</span>
+                        <span id="modalCredits" class="font-bold text-slate-900">4.0 Credits</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 font-semibold text-[10px] uppercase block">Building/Room:</span>
+                        <span id="modalRoom" class="font-bold text-mnsu-purple">Online Zoom Live</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 font-semibold text-[10px] uppercase block">Schedule:</span>
+                        <span id="modalSchedule" class="font-bold text-slate-900">Tue 18:00-20:00 &bull; Wed 18:00-21:00</span>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="font-bold text-slate-900 mb-1 text-xs uppercase tracking-wide text-mnsu-purple">Catalog Description:</h5>
+                    <p id="modalDesc" class="text-slate-600 leading-relaxed text-[11px]"></p>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 text-right">
+                <button onclick="closeModal()" class="bg-mnsu-purple hover:bg-mnsu-darkPurple text-white font-medium text-xs px-4 py-1.5 rounded-lg transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // Real Department Data for Minnesota State University, Mankato Programs
+        const majorCurricula = {
+            'swe': {
+                name: 'B.S. Computer Engineering',
+                college: 'College of Science, Engineering & Technology (CSET)',
+                credits: 'Enrolled &bull; Full-Time (16.0 Total Credits)',
+                courses: [
+                    { code: 'CIS 455-01', crn: '004892', title: 'Software Quality Assurance & Security Auditing', cr: '4.0', times: 'Tue 18:00-20:00 / Wed 18:00-21:00', loc: 'Online Zoom Live', room: 'Wissink Hall Sync', inst: 'Dr. M. Lindholm', desc: 'Comprehensive study of software testing methodologies, automated test suites, OWASP security principles, auditing metrics, and verification.' },
+                    { code: 'IT 440-01', crn: '004895', title: 'IT Project Management & Agile Systems', cr: '4.0', times: 'Tue 20:00-22:00 / Thu 18:00-21:00', loc: 'Online Zoom Live', room: 'Trafton Science CSET', inst: 'Dr. S. K. Johnson', desc: 'Agile methodologies, sprint planning, project governance, risk mitigation, and team leadership in technical projects.' },
+                    { code: 'CIS 420-01', crn: '004901', title: 'Enterprise Application Architecture & UI', cr: '4.0', times: 'Mon 18:00-21:00 / Fri 18:00-21:00', loc: 'Wissink Hall 210', room: 'Friday: Online Sync', inst: 'Prof. R. Erickson', desc: 'Enterprise application design patterns, user interface human factors, business process automation, and microservice integration.' },
+                    { code: 'CIS 485-01', crn: '004918', title: 'Senior Software Architecture & Web Cloud', cr: '4.0', times: 'Thu 21:00-23:00 / Fri 21:00-23:00', loc: 'Online Zoom Live', room: 'Wissink Cloud Lab', inst: 'Dr. D. F. Keefe', desc: 'Distributed systems, REST/GraphQL cloud services, CI/CD pipeline automation, Docker containerization, and capstone engineering.' }
+                ]
+            },
+            'cs': {
+                name: 'B.S. Computer Science',
+                college: 'College of Science, Engineering & Technology (CSET)',
+                credits: 'Enrolled &bull; Full-Time (15.0 Total Credits)',
+                courses: [
+                    { code: 'CS 350-01', crn: '003112', title: 'Data Structures & Algorithms in C++', cr: '4.0', times: 'Mon/Wed 10:00-11:50', loc: 'Wissink Hall 285', room: 'WH 285', inst: 'Dr. R. Rajaravivarma', desc: 'Advanced tree structures, graph algorithms, asymptotic complexity analysis, dynamic programming, and memory management.' },
+                    { code: 'CS 460-01', crn: '003118', title: 'Operating Systems & System Programming', cr: '4.0', times: 'Tue/Thu 14:00-15:50', loc: 'Wissink Hall 281', room: 'WH 281', inst: 'Dr. N. Zaman', desc: 'Process scheduling, concurrency, virtual memory management, file systems, and Unix POSIX kernel API programming.' },
+                    { code: 'MATH 121-02', crn: '001289', title: 'Calculus I - Analytical Geometry', cr: '4.0', times: 'Mon/Tue/Wed/Fri 13:00-13:50', loc: 'Armstrong Hall 102', room: 'AH 102', inst: 'Dr. I. Cherif', desc: 'Limits, derivatives, applications of differentiation, Riemann sums, definite integrals, and Fundamental Theorem of Calculus.' },
+                    { code: 'CS 320-01', crn: '003105', title: 'Theory of Computation & Automata', cr: '3.0', times: 'Mon/Wed/Fri 09:00-09:50', loc: 'Wissink Hall 215', room: 'WH 215', inst: 'Dr. G. Berg', desc: 'Regular languages, finite state automata, context-free grammars, Turing machines, and decidability theory.' }
+                ]
+            },
+            'me': {
+                name: 'B.S. Mechanical Engineering',
+                college: 'College of Science, Engineering & Technology (CSET)',
+                credits: 'Enrolled &bull; Full-Time (16.0 Total Credits)',
+                courses: [
+                    { code: 'ME 212-01', crn: '002450', title: 'Statics & Mechanics of Materials', cr: '3.0', times: 'Mon/Wed/Fri 11:00-11:50', loc: 'Trafton Science C-124', room: 'TR C-124', inst: 'Dr. P. Leckband', desc: 'Equilibrium of force systems, shear and bending moment diagrams, stress and strain tensors, and axial deformation.' },
+                    { code: 'ME 336-01', crn: '002462', title: 'Fluid Mechanics & Thermal Systems', cr: '4.0', times: 'Tue/Thu 09:00-10:50', loc: 'Trafton Science N-230', room: 'TR N-230 Lab', inst: 'Dr. J. Slotten', desc: 'Continuity, momentum and energy equations, laminar and turbulent flow, boundary layers, and pipe friction losses.' },
+                    { code: 'PHYS 221-01', crn: '001980', title: 'General Physics I (Calculus-Based)', cr: '4.0', times: 'Mon/Wed/Fri 14:00-14:50', loc: 'Trafton Science S-110', room: 'TR S-110', inst: 'Dr. M. Roberts', desc: 'Newtonian mechanics, work and kinetic energy, rotational dynamics, harmonic oscillations, and wave motion.' },
+                    { code: 'EE 281-01', crn: '003204', title: 'Circuits & Instrumentation for Engineers', cr: '5.0', times: 'Mon/Wed/Fri 13:00-13:50', loc: 'Trafton Science E-102', room: 'TR E-102 Lab', inst: 'Dr. H. Chen', desc: 'DC and AC circuit laws, operational amplifiers, transducers, signal conditioning, and laboratory data acquisition.' }
+                ]
+            },
+            'nurs': {
+                name: 'B.S. Nursing (Pre-Licensure)',
+                college: 'College of Allied Health & Nursing',
+                credits: 'Enrolled &bull; Full-Time (15.0 Total Credits)',
+                courses: [
+                    { code: 'NURS 282-01', crn: '005120', title: 'Pathophysiology for Nursing Practice', cr: '3.0', times: 'Mon/Wed 08:30-09:50', loc: 'Clinical Sciences 210', room: 'CSB 210', inst: 'Prof. L. Young', desc: 'Mechanisms of disease, cellular adaptation, immune response, and systemic organ dysfunctions across the lifespan.' },
+                    { code: 'NURS 386-01', crn: '005128', title: 'Health Assessment & Clinical Skills', cr: '4.0', times: 'Tue 08:00-12:00 (Lab)', loc: 'Wissink Hall Sim Lab', room: 'WH 101 Sim', inst: 'Dr. K. Miller', desc: 'Systematic physical assessment techniques, patient interviewing, health history, and core bedside clinical interventions.' },
+                    { code: 'BIOL 220-01', crn: '001430', title: 'Human Anatomy & Physiology I', cr: '4.0', times: 'Mon/Wed/Fri 11:00-11:50', loc: 'Trafton Science S-104', room: 'TR S-104', inst: 'Dr. D. Sharlin', desc: 'In-depth exploration of integumentary, skeletal, muscular, and nervous organ systems.' },
+                    { code: 'CHEM 111-01', crn: '001890', title: 'Chemistry of Life Processes', cr: '4.0', times: 'Tue/Thu 13:00-14:50', loc: 'Trafton Science N-112', room: 'TR N-112', inst: 'Dr. S. Trent', desc: 'Chemical principles essential for understanding biological systems, metabolism, and pharmacokinetics.' }
+                ]
+            },
+            'cit': {
+                name: 'B.S. Computer Information Technology',
+                college: 'College of Science, Engineering & Technology (CSET)',
+                credits: 'Enrolled &bull; Full-Time (16.0 Total Credits)',
+                courses: [
+                    { code: 'IT 210-01', crn: '004110', title: 'Enterprise Network Technologies', cr: '4.0', times: 'Mon/Wed 12:00-13:50', loc: 'Wissink Hall 215', room: 'WH 215', inst: 'Dr. C. Ward', desc: 'OSI and TCP/IP networking models, subnetting, router configuration, switches, VLANs, and firewall security.' },
+                    { code: 'IT 310-01', crn: '004125', title: 'Database Systems & SQL Administration', cr: '4.0', times: 'Tue/Thu 10:00-11:50', loc: 'Wissink Hall 285', room: 'WH 285', inst: 'Dr. K. Hanson', desc: 'Relational database architecture, normalization, complex SQL queries, index optimization, and PostgreSQL server management.' },
+                    { code: 'IT 340-01', crn: '004130', title: 'Linux System Administration & Scripting', cr: '4.0', times: 'Mon/Wed 14:00-15:50', loc: 'Wissink Hall 281', room: 'WH 281', inst: 'Prof. J. Nelson', desc: 'Linux kernel management, bash automation, user permissions, systemd services, SSH hardening, and package repositories.' },
+                    { code: 'IT 440-01', crn: '004895', title: 'IT Project Management & Agile Systems', cr: '4.0', times: 'Tue 20:00-22:00 / Thu 18:00-21:00', loc: 'Online Zoom Live', room: 'Trafton Science', inst: 'Dr. S. K. Johnson', desc: 'Agile methodologies, sprint planning, project governance, risk mitigation, and team leadership.' }
+                ]
+            },
+            'av': {
+                name: 'B.S. Aviation - Professional Flight',
+                college: 'College of Science, Engineering & Technology (CSET)',
+                credits: 'Enrolled &bull; Full-Time (15.0 Total Credits)',
+                courses: [
+                    { code: 'AVIA 150-01', crn: '006100', title: 'Private Pilot Flight Theory', cr: '3.0', times: 'Mon/Wed/Fri 09:00-09:50', loc: 'Armstrong Hall 204', room: 'AH 204', inst: 'Capt. T. Miller', desc: 'Aerodynamics, FAA regulations, aircraft instruments, navigation charts, and aviation weather analysis.' },
+                    { code: 'AVIA 250-01', crn: '006115', title: 'Instrument Rating Ground School', cr: '3.0', times: 'Tue/Thu 10:00-11:15', loc: 'Armstrong Hall 206', room: 'AH 206', inst: 'Capt. R. Larson', desc: 'IFR flight planning, approach procedures, ATC communications, and cockpit glass avionics.' },
+                    { code: 'AVIA 151-01', crn: '006105', title: 'Primary Flight Lab - Mankato Airport (MKT)', cr: '2.0', times: 'Scheduled Flight Blocks', loc: 'Mankato Regional Airport', room: 'MKT Hangar 3', inst: 'MNSU Flight Instructors', desc: 'Dual flight instruction in Piper Archer aircraft, stalls, cross-country navigation, and FAA private pilot checkride.' },
+                    { code: 'MET 101-01', crn: '001550', title: 'Aviation Meteorology & Weather Hazards', cr: '3.0', times: 'Mon/Wed/Fri 11:00-11:50', loc: 'Trafton Science N-110', room: 'TR N-110', inst: 'Dr. M. Clark', desc: 'Atmospheric thermodynamics, fronts, icing, severe thunderstorms, wind shear, and METAR/TAF forecasting.' },
+                    { code: 'MATH 112-01', crn: '001210', title: 'College Algebra & Trigonometry', cr: '4.0', times: 'Mon/Tue/Wed/Thu 14:00-14:50', loc: 'Armstrong Hall 101', room: 'AH 101', inst: 'Prof. S. Davis', desc: 'Functions, vectors, trigonometric identities, and algebraic problem-solving for aviation applications.' }
+                ]
+            },
+            'acct': {
+                name: 'B.S. Accounting',
+                college: 'College of Business',
+                credits: 'Enrolled &bull; Full-Time (15.0 Total Credits)',
+                courses: [
+                    { code: 'ACCT 200-01', crn: '007100', title: 'Financial Accounting Principles', cr: '3.0', times: 'Mon/Wed/Fri 10:00-10:50', loc: 'Morris Hall 210', room: 'MH 210', inst: 'Dr. B. Smith', desc: 'Accounting cycle, financial statements, revenue recognition, assets valuation, and GAAP standards.' },
+                    { code: 'ACCT 300-01', crn: '007115', title: 'Intermediate Financial Accounting I', cr: '3.0', times: 'Tue/Thu 11:00-12:15', loc: 'Morris Hall 102', room: 'MH 102', inst: 'Dr. C. Paulson', desc: 'In-depth balance sheet reporting, revenue recognition models, inventory costing, and time value of money.' },
+                    { code: 'BLAW 200-01', crn: '007204', title: 'Legal Environment of Business', cr: '3.0', times: 'Mon/Wed/Fri 13:00-13:50', loc: 'Morris Hall 105', room: 'MH 105', inst: 'Prof. J. Thompson', desc: 'Contract law, torts, corporate governance, employment law, and ethical decision-making in business.' },
+                    { code: 'ECON 201-01', crn: '007300', title: 'Principles of Microeconomics', cr: '3.0', times: 'Tue/Thu 09:30-10:45', loc: 'Armstrong Hall 310', room: 'AH 310', inst: 'Dr. R. Kelly', desc: 'Market demand and supply, consumer utility, market structures, monopolies, and elasticity.' },
+                    { code: 'FINA 320-01', crn: '007410', title: 'Business Finance & Capital Budgeting', cr: '3.0', times: 'Mon/Wed/Fri 14:00-14:50', loc: 'Morris Hall 215', room: 'MH 215', inst: 'Dr. T. Miller', desc: 'Corporate valuation, risk and return trade-offs, capital asset pricing model (CAPM), and working capital management.' }
+                ]
+            }
+        };
+
+        let activeCurriculum = majorCurricula['swe'];
+
+        // Use the actual generation date for this local preview.
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const dateString = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            
+            document.getElementById('cardIssuedDate').innerText = dateString;
+            document.getElementById('footerPrintedDate').innerText = dateString;
+            document.getElementById('pdfGeneratedDate').innerText = dateString;
+            document.getElementById('pdfFooterDate').innerText = dateString;
+            renderPdfDocument();
+        });
+
+        function renderPdfDocument() {
+            document.getElementById('pdfMajor').innerText = activeCurriculum.name;
+            document.getElementById('pdfCourseRows').innerHTML = activeCurriculum.courses.map(course => `
+                <tr>
+                    <td><strong>${course.code}</strong></td>
+                    <td>${course.crn}</td>
+                    <td>${course.title}</td>
+                    <td>${course.cr}</td>
+                    <td>${course.times}</td>
+                    <td>${course.loc}<br><span>${course.room}</span></td>
+                    <td>${course.inst}</td>
+                </tr>
+            `).join('');
+        }
+
+        function loadLogoAsPng() {
+            return new Promise((resolve) => {
+                const image = new Image();
+                image.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = image.naturalWidth || 600;
+                    canvas.height = image.naturalHeight || 180;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(image, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                image.onerror = () => resolve(null);
+                image.src = 'image.png';
+            });
+        }
+
+        async function downloadEnrollmentPdf() {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                printSchedulePdf();
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            if (typeof doc.autoTable !== 'function') {
+                printSchedulePdf();
+                return;
+            }
+            const generatedOn = document.getElementById('pdfGeneratedDate').innerText;
+            const logo = await loadLogoAsPng();
+
+            if (logo) {
+                doc.addImage(logo, 'PNG', 14, 12, 54, 16);
+            }
+            doc.setTextColor(73, 48, 110);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.text('STUDENT RECORDS AND REGISTRATION', 74, 16);
+            doc.setFontSize(17);
+            doc.text('ENROLLMENT SUMMARY', 74, 24);
+            doc.setTextColor(71, 85, 105);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.text('Class schedule and registered courses · Fall Semester 2026', 74, 30);
+            doc.setDrawColor(73, 48, 110);
+            doc.setLineWidth(0.8);
+            doc.line(14, 36, 196, 36);
+
+            doc.setTextColor(73, 48, 110);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('STUDENT INFORMATION', 14, 45);
+            doc.setDrawColor(203, 213, 225);
+            doc.setLineWidth(0.25);
+            doc.rect(14, 49, 182, 31);
+            doc.setFontSize(7.5);
+            doc.setTextColor(100, 116, 139);
+            const labels = [
+                ['FULL NAME', 'COLIN ROSKOS'],
+                ['STARID', 'cr4827rx'],
+                ['TECH ID', '10384726'],
+                ['ACADEMIC PROGRAM', activeCurriculum.name],
+                ['ENROLLMENT DATE', 'August 17, 2026'],
+                ['GENERATED ON', generatedOn]
+            ];
+            labels.forEach((item, index) => {
+                const column = index % 3;
+                const row = Math.floor(index / 3);
+                const x = 18 + column * 60.5;
+                const y = 56 + row * 14;
+                doc.text(item[0], x, y);
+                doc.setTextColor(23, 32, 51);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.text(item[1], x, y + 5, { maxWidth: 55 });
+                doc.setTextColor(100, 116, 139);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7.5);
+            });
+
+            doc.setTextColor(73, 48, 110);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('REGISTERED COURSES AND CLASS SCHEDULE', 14, 91);
+            doc.autoTable({
+                startY: 95,
+                margin: { left: 14, right: 14 },
+                head: [['COURSE', 'CRN', 'COURSE TITLE', 'CR.', 'DAYS AND TIMES', 'DELIVERY / LOCATION', 'INSTRUCTOR']],
+                body: activeCurriculum.courses.map(course => [
+                    course.code, course.crn, course.title, course.cr,
+                    course.times, `${course.loc}\n${course.room}`, course.inst
+                ]),
+                theme: 'grid',
+                styles: { font: 'helvetica', fontSize: 7, cellPadding: 2.2, textColor: [23, 32, 51], lineColor: [203, 213, 225], lineWidth: 0.2 },
+                headStyles: { fillColor: [73, 48, 110], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 6.5 },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+                columnStyles: { 0: { cellWidth: 22 }, 1: { cellWidth: 15 }, 2: { cellWidth: 42 }, 3: { cellWidth: 10 }, 4: { cellWidth: 30 }, 5: { cellWidth: 35 }, 6: { cellWidth: 28 } }
+            });
+
+            const footerY = Math.min((doc.lastAutoTable?.finalY || 180) + 15, 280);
+            doc.setDrawColor(203, 213, 225);
+            doc.line(14, footerY, 196, footerY);
+            doc.setTextColor(100, 116, 139);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.text('Enrollment summary for student records', 14, footerY + 6);
+            doc.text(`Generated on ${generatedOn}`, 196, footerY + 6, { align: 'right' });
+            doc.save('COLIN_ROSKOS_Fall_2026_Academic_Schedule_Demo.pdf');
+        }
+
+        function printSchedulePdf() {
+            const originalTitle = document.title;
+            document.title = 'COLIN_ROSKOS_Fall_2026_Academic_Schedule_Demo';
+            window.addEventListener('afterprint', () => {
+                document.title = originalTitle;
+            }, { once: true });
+            window.print();
+        }
+
+        function printProfileCard() {
+            document.body.classList.add('printing-profile');
+            const originalTitle = document.title;
+            document.title = 'COLIN_ROSKOS_Personal_Profile_Card_Demo';
+            window.addEventListener('afterprint', () => {
+                document.body.classList.remove('printing-profile');
+                document.title = originalTitle;
+            }, { once: true });
+            window.print();
+        }
+
+        function changeDegreeProgram() {
+            const selectedKey = document.getElementById('majorSelector').value;
+            activeCurriculum = majorCurricula[selectedKey] || majorCurricula['swe'];
+
+            document.getElementById('headerCollegeName').innerText = activeCurriculum.college;
+            document.getElementById('studentMajorText').innerText = activeCurriculum.name;
+            document.getElementById('studentCreditBadge').innerText = activeCurriculum.credits;
+            const recordProgram = document.getElementById('recordProgram');
+            if (recordProgram) recordProgram.innerText = activeCurriculum.name;
+
+            renderCourseListTable();
+            renderPdfDocument();
+        }
+
+        function renderCourseListTable() {
+            const tbody = document.getElementById('courseListTableBody');
+            tbody.innerHTML = '';
+
+            activeCurriculum.courses.forEach(course => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-purple-50/50 transition cursor-pointer';
+                tr.onclick = () => showCourseModalDirect(course);
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold font-mono text-mnsu-purple border-r border-slate-200">${course.code}</td>
+                    <td class="p-2.5 text-center font-mono text-slate-600 border-r border-slate-200">${course.crn}</td>
+                    <td class="p-2.5 border-r border-slate-200">
+                        <span class="font-bold text-slate-900 hover:text-mnsu-purple">${course.title}</span>
+                        <span class="text-[10px] text-slate-500 block">Grading: Regular Letter (A-F) &bull; Fall 2026</span>
+                    </td>
+                    <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">${course.cr}</td>
+                    <td class="p-2.5 border-r border-slate-200 font-medium">${course.times}</td>
+                    <td class="p-2.5 border-r border-slate-200">
+                        <span class="font-semibold text-slate-800">${course.loc}</span>
+                        <span class="text-[10px] text-slate-500 block">${course.room}</span>
+                    </td>
+                    <td class="p-2.5 border-r border-slate-200 text-slate-800">${course.inst}</td>
+                    <td class="p-2.5 text-center">
+                        <span class="bg-emerald-100 text-emerald-800 font-bold text-[10px] px-2 py-0.5 rounded">Enrolled</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleView(mode) {
+            const gridSection = document.getElementById('weeklyGridSection');
+            const btnGrid = document.getElementById('btnScheduleGrid');
+            const btnList = document.getElementById('btnScheduleList');
+
+            if (mode === 'grid') {
+                gridSection.classList.remove('hidden');
+                btnGrid.className = "px-3 py-1.5 rounded-md font-bold transition bg-mnsu-purple text-white shadow-xs";
+                btnList.className = "px-3 py-1.5 rounded-md font-semibold transition text-slate-600 hover:text-mnsu-purple";
+            } else {
+                gridSection.classList.add('hidden');
+                btnList.className = "px-3 py-1.5 rounded-md font-bold transition bg-mnsu-purple text-white shadow-xs";
+                btnGrid.className = "px-3 py-1.5 rounded-md font-semibold transition text-slate-600 hover:text-mnsu-purple";
+            }
+        }
+
+        function showCourseInfo(codePrefix) {
+            const found = activeCurriculum.courses.find(c => c.code.includes(codePrefix)) || activeCurriculum.courses[0];
+            showCourseModalDirect(found);
+        }
+
+        function showCourseModalDirect(course) {
+            document.getElementById('modalCode').innerText = course.code;
+            document.getElementById('modalTitle').innerText = course.title;
+            document.getElementById('modalInstructor').innerText = course.inst;
+            document.getElementById('modalCredits').innerText = course.cr + ' Credits';
+            document.getElementById('modalRoom').innerText = course.loc + ' (' + course.room + ')';
+            document.getElementById('modalSchedule').innerText = course.times;
+            document.getElementById('modalDesc').innerText = course.desc;
+
+            const modal = document.getElementById('courseModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('courseModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
