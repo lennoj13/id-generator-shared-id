@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 90" width="360" height="90">
+  <!-- Yale University Coat of Arms Shield -->
+  <g transform="translate(10, 8)">
+    <rect x="5" y="5" width="55" height="64" rx="4" fill="#00356B" />
+    <path d="M 5 50 C 5 68, 32.5 74, 32.5 74 C 32.5 74, 60 68, 60 50 L 60 5 L 5 5 Z" fill="#00356B" stroke="#ffffff" stroke-width="1.5" />
+    <!-- Open Book -->
+    <path d="M 16 26 C 24 24, 32 27, 32 27 C 32 27, 40 24, 48 26 L 48 48 C 40 46, 32 49, 32 49 C 32 49, 24 46, 16 48 Z" fill="#ffffff" />
+    <line x1="32" y1="27" x2="32" y2="49" stroke="#00356B" stroke-width="1" />
+    <!-- Book lines / Lux et Veritas symbol -->
+    <line x1="20" y1="32" x2="28" y2="31" stroke="#00356B" stroke-width="1" />
+    <line x1="20" y1="37" x2="28" y2="36" stroke="#00356B" stroke-width="1" />
+    <line x1="20" y1="42" x2="28" y2="41" stroke="#00356B" stroke-width="1" />
+    <line x1="36" y1="31" x2="44" y2="32" stroke="#00356B" stroke-width="1" />
+    <line x1="36" y1="36" x2="44" y2="37" stroke="#00356B" stroke-width="1" />
+    <line x1="36" y1="41" x2="44" y2="42" stroke="#00356B" stroke-width="1" />
+  </g>
+  <!-- Yale Typography -->
+  <text x="80" y="47" font-family="'Inter', 'Yale Roman', 'Times New Roman', serif" font-size="34" font-weight="900" fill="#00356B" letter-spacing="1">Yale</text>
+  <text x="160" y="46" font-family="'Inter', 'Yale Roman', sans-serif" font-size="20" font-weight="600" fill="#475569" letter-spacing="0.5">University</text>
+  <text x="82" y="66" font-family="'Inter', sans-serif" font-size="10" font-weight="700" fill="#94a3b8" letter-spacing="2">EST. 1701 • LUX ET VERITAS</text>
+</svg>

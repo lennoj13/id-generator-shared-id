@@ -2,39 +2,88 @@ import React from 'react';
 
 /**
  * Universal Student ID Card Template
- * Renders a professional student ID card styled per the university config colors.
+ * Renders a professional collegiate student ID card styled per university branding.
  */
 export default function IdCardTemplate({ config, studentData }) {
   if (!config || !studentData) return null;
 
   const { colors } = config;
+  const primaryColor = colors.primary || '#1e293b';
+  const accentColor = colors.accent || '#3b82f6';
 
   return (
     <div
       style={{
-        fontFamily: "'Inter', Arial, sans-serif",
-        width: '400px',
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+        width: '420px',
+        display: 'flex',
+        flexDirection: 'column',
         background: '#ffffff',
-        border: `3px solid ${colors.primary}`,
-        borderTop: `9px solid ${colors.accent === '#1E1E1E' ? colors.primary : colors.accent}`,
+        border: `2px solid #cbd5e1`,
         borderRadius: '12px',
         overflow: 'hidden',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        boxSizing: 'border-box'
       }}
     >
-      {/* Card Header */}
+      {/* Top University Brand Strip */}
       <div
         style={{
-          background: colors.primary,
+          background: primaryColor,
           color: '#ffffff',
-          padding: '10px 16px',
-          fontSize: '11px',
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          textAlign: 'center',
+          padding: '12px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          borderBottom: `3px solid ${accentColor}`,
         }}
       >
-        {config.name}
+        {config.logoUrl && (
+          <div
+            style={{
+              background: '#ffffff',
+              padding: '3px 6px',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <img
+              src={config.logoUrl}
+              alt={config.shortName}
+              style={{ height: '28px', maxWidth: '70px', objectFit: 'contain' }}
+            />
+          </div>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: '12px',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+              lineHeight: 1.15,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {config.name}
+          </div>
+          <div
+            style={{
+              fontSize: '9px',
+              color: accentColor,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              marginTop: '2px',
+              textTransform: 'uppercase'
+            }}
+          >
+            STUDENT IDENTIFICATION CARD
+          </div>
+        </div>
       </div>
 
       {/* Card Body */}
@@ -44,21 +93,22 @@ export default function IdCardTemplate({ config, studentData }) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '14px',
+          gap: '16px',
         }}
       >
-        {/* Photo */}
+        {/* Photo + Student Name */}
         <div
           style={{
-            width: '120px',
-            height: '150px',
-            border: `2px solid ${colors.accent === '#1E1E1E' ? colors.primary : colors.accent}`,
-            borderRadius: '6px',
+            width: '180px',
+            height: '220px',
+            border: `2px solid ${accentColor}`,
+            borderRadius: '8px',
             overflow: 'hidden',
             background: '#f1f5f9',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
           }}
         >
           {studentData.photoUrl ? (
@@ -75,12 +125,12 @@ export default function IdCardTemplate({ config, studentData }) {
           )}
         </div>
 
-        {/* Name */}
+        {/* Student Name */}
         <div style={{ textAlign: 'center' }}>
           <div
             style={{
-              fontSize: '16px',
-              fontWeight: 800,
+              fontSize: '19px',
+              fontWeight: 900,
               color: '#0f172a',
               textTransform: 'uppercase',
               letterSpacing: '0.02em',
@@ -90,97 +140,192 @@ export default function IdCardTemplate({ config, studentData }) {
           </div>
           <div
             style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              color: colors.primary,
+              fontSize: '10.5px',
+              fontWeight: 800,
+              color: primaryColor,
               textTransform: 'uppercase',
               marginTop: '4px',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
             }}
           >
-            Student Identification Card
+            {studentData.status || 'Enrolled Student'}
           </div>
         </div>
 
-        {/* Details */}
+        {/* Key Student Details */}
         <div
           style={{
             width: '100%',
-            fontSize: '10px',
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '6px',
+            padding: '10px 14px',
+            fontSize: '11px',
             color: '#334155',
-            lineHeight: 1.8,
-            textAlign: 'center',
+            lineHeight: 1.6,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px'
           }}
         >
-          <div>
-            Student Email: <strong>{studentData.email}</strong>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>{config.idLabel}:</span>
+            <strong style={{ color: primaryColor, fontFamily: 'monospace', fontWeight: 800 }}>
+              {studentData.studentId}
+            </strong>
           </div>
-          <div>
-            {config.idLabel}: <strong style={{ color: colors.primary }}>{studentData.studentId}</strong>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>{config.secondaryIdLabel}:</span>
+            <strong style={{ color: '#0f172a', fontFamily: 'monospace', fontWeight: 700 }}>
+              {studentData.techId}
+            </strong>
           </div>
-          <div>
-            {config.secondaryIdLabel}: <strong>{studentData.techId}</strong>
+          {studentData.dobShort && (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#64748b' }}>Date of Birth:</span>
+              <strong style={{ color: '#0f172a', fontFamily: 'monospace', fontWeight: 700 }}>
+                {studentData.dobShort}
+              </strong>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>Email:</span>
+            <strong style={{ color: '#0f172a', fontWeight: 600 }}>{studentData.email}</strong>
           </div>
-          <div>
-            Program: <strong>{studentData.majorName}</strong>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>Program:</span>
+            <strong style={{ color: '#0f172a', fontWeight: 700, textAlign: 'right', maxWidth: '65%' }}>
+              {studentData.majorName}
+            </strong>
           </div>
-          <div>
-            Term: <strong>{studentData.term}</strong>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>Term:</span>
+            <strong style={{ color: primaryColor, fontWeight: 700 }}>{studentData.term}</strong>
           </div>
         </div>
 
-        {/* QR Code */}
-        {studentData.qrDataUrl ? (
+        {/* Validity & Expiration Strip (Required for SheerID verification) */}
+        <div
+          style={{
+            width: '100%',
+            background: '#ffffff',
+            border: `1px solid ${accentColor}`,
+            borderRadius: '6px',
+            padding: '6px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '10px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div style={{ color: '#475569' }}>
+            ISSUED: <strong style={{ color: '#0f172a', fontFamily: 'monospace' }}>{studentData.idIssuedDate || '08/2026'}</strong>
+          </div>
+          <div style={{ color: '#166534', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
+            EXPIRES: <span style={{ fontFamily: 'monospace' }}>{studentData.idExpiryDate || '08/2027'}</span>
+          </div>
+        </div>
+
+        {/* Verification QR Code */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            marginTop: '2px',
+          }}
+        >
+          {studentData.qrDataUrl ? (
+            <div
+              style={{
+                width: '135px',
+                height: '135px',
+                border: '1px solid #cbd5e1',
+                borderRadius: '6px',
+                padding: '6px',
+                background: '#ffffff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img
+                src={studentData.qrDataUrl}
+                alt="Verification QR Code"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                width: '135px',
+                height: '135px',
+                border: '1px dashed #cbd5e1',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#94a3b8',
+                fontSize: '10px',
+              }}
+            >
+              QR Generating...
+            </div>
+          )}
           <div
             style={{
-              width: '90px',
-              height: '90px',
-              border: '1px solid #cbd5e1',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: '#ffffff',
-              marginTop: '4px',
-              padding: '2px',
+              fontSize: '8.5px',
+              color: '#64748b',
+              letterSpacing: '0.06em',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              marginTop: '5px',
             }}
           >
-            <img src={studentData.qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            Scan for Student Record Verification
           </div>
-        ) : (
+        </div>
+
+        {/* Barcode Strip */}
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            paddingTop: '4px'
+          }}
+        >
           <div
             style={{
-              width: '80px',
-              height: '80px',
-              border: '1px solid #cbd5e1',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: '#f8fafc',
-              marginTop: '4px',
+              width: '260px',
+              height: '32px',
+              backgroundImage: 'repeating-linear-gradient(90deg, #1e293b 0px, #1e293b 2px, transparent 2px, transparent 4px, #1e293b 4px, #1e293b 5px, transparent 5px, transparent 8px, #1e293b 8px, #1e293b 11px, transparent 11px, transparent 13px)',
+              borderRadius: '2px'
             }}
-          >
-            <svg width="50" height="50" viewBox="0 0 50 50">
-              <rect x="0" y="0" width="20" height="20" fill={colors.primary} rx="2" />
-              <rect x="30" y="0" width="20" height="20" fill={colors.primary} rx="2" />
-              <rect x="0" y="30" width="20" height="20" fill={colors.primary} rx="2" />
-              <rect x="5" y="5" width="10" height="10" fill="#fff" rx="1" />
-              <rect x="35" y="5" width="10" height="10" fill="#fff" rx="1" />
-              <rect x="5" y="35" width="10" height="10" fill="#fff" rx="1" />
-              <rect x="7" y="7" width="6" height="6" fill={colors.primary} rx="0.5" />
-              <rect x="37" y="7" width="6" height="6" fill={colors.primary} rx="0.5" />
-              <rect x="7" y="37" width="6" height="6" fill={colors.primary} rx="0.5" />
-              <rect x="24" y="24" width="6" height="6" fill={colors.primary} rx="1" />
-              <rect x="32" y="32" width="6" height="6" fill={colors.primary} rx="1" />
-              <rect x="40" y="32" width="6" height="6" fill={colors.primary} rx="1" />
-              <rect x="32" y="40" width="6" height="6" fill={colors.primary} rx="1" />
-              <rect x="40" y="40" width="6" height="6" fill={colors.primary} rx="1" />
-              <rect x="24" y="32" width="6" height="6" fill={colors.primary} rx="1" />
-              <rect x="24" y="40" width="6" height="6" fill={colors.primary} rx="1" />
-            </svg>
+          />
+          <div style={{ fontFamily: 'monospace', fontSize: '9px', letterSpacing: '0.15em', color: '#475569', marginTop: '2px' }}>
+            *{studentData.techId}*
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Card Footer Warning / Reference */}
+      <div
+        style={{
+          background: '#f1f5f9',
+          borderTop: '1px solid #e2e8f0',
+          padding: '8px 16px',
+          textAlign: 'center',
+          fontSize: '9px',
+          color: '#64748b',
+          lineHeight: 1.3,
+        }}
+      >
+        Official student identification card • {config.registrarOffice} • Valid for academic year
       </div>
     </div>
   );

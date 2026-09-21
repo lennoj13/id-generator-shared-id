@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 90" width="380" height="90">
+  <!-- Oxford Shield -->
+  <g transform="translate(10, 8)">
+    <path d="M 5 5 L 60 5 L 60 48 C 60 66, 32.5 74, 32.5 74 C 32.5 74, 5 66, 5 48 Z" fill="#002147" stroke="#C99700" stroke-width="2" />
+    <!-- Crowns -->
+    <path d="M 16 16 L 20 22 L 25 18 L 30 22 L 34 16 L 33 24 L 17 24 Z" fill="#C99700" />
+    <path d="M 36 16 L 40 22 L 45 18 L 50 22 L 54 16 L 53 24 L 37 24 Z" transform="translate(-10, 0)" fill="#C99700" />
+    <!-- Open Book Inscribed Dominus Illuminatio Mea -->
+    <path d="M 18 36 C 25 34, 32.5 36, 32.5 36 C 32.5 36, 40 34, 47 36 L 47 54 C 40 52, 32.5 54, 32.5 54 C 32.5 54, 25 52, 18 54 Z" fill="#ffffff" />
+    <line x1="32.5" y1="36" x2="32.5" y2="54" stroke="#002147" stroke-width="1" />
+    <!-- Lower Crown -->
+    <path d="M 26 59 L 29 63 L 32.5 61 L 36 63 L 39 59 L 38 65 L 27 65 Z" fill="#C99700" />
+  </g>
+  <!-- Oxford Typography -->
+  <text x="80" y="42" font-family="'Inter', 'Minion Pro', Georgia, serif" font-size="22" font-weight="900" fill="#002147" letter-spacing="1.5">UNIVERSITY OF</text>
+  <text x="80" y="66" font-family="'Inter', 'Minion Pro', Georgia, serif" font-size="26" font-weight="900" fill="#C99700" letter-spacing="2">OXFORD</text>
+</svg>

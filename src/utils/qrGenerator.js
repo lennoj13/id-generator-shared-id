@@ -2,41 +2,37 @@ import QRCode from 'qrcode';
 
 /**
  * Generate a QR code as a data URL (base64 PNG).
- * The QR encodes student data in the same format as the original:
- *
- *   {UNIVERSITY_TAG}-STUDENT
- *   ID: {techId}
- *   {ID_LABEL}: {studentId}
- *   NAME: {fullName}
- *   PROGRAM: {majorName}
- *   EMAIL: {email}
- *   TERM: {termCode}
- *   STATUS: ENROLLED
+ * Encodes authentic student record metadata that strictly matches
+ * the IDs, name, major, email, and term generated on the Schedule and ID card.
  *
  * @param {object} studentData - The generated student data object.
  * @param {object} config - The university template config.
  * @returns {Promise<string>} A data URL (base64 PNG) of the QR code.
  */
 export async function generateStudentQR(studentData, config) {
-  const tag = config.shortName.toUpperCase().replace(/\s+/g, '');
+  if (!studentData || !config) return null;
+
+  const tag = (config.shortName || config.id || 'UNIV').toUpperCase().replace(/\s+/g, '');
 
   const qrText = [
-    `${tag}-STUDENT`,
+    `${tag}-STUDENT-RECORD`,
     `ID: ${studentData.techId}`,
-    `${config.idLabel.toUpperCase()}: ${studentData.studentId}`,
+    `${(config.idLabel || 'ID').toUpperCase()}: ${studentData.studentId}`,
     `NAME: ${studentData.fullName}`,
+    ...(studentData.dobShort || studentData.dob ? [`DOB: ${studentData.dobShort || studentData.dob}`] : []),
     `PROGRAM: ${studentData.majorName}`,
     `EMAIL: ${studentData.email}`,
-    `TERM: ${config.termCode}`,
+    `TERM: ${studentData.termCode || config.termCode || 'F26'}`,
+    ...(studentData.receiptNumber ? [`RECEIPT: ${studentData.receiptNumber}`] : []),
     `STATUS: ENROLLED`,
   ].join('\n');
 
   try {
     const dataUrl = await QRCode.toDataURL(qrText, {
-      width: 200,
+      width: 400,
       margin: 1,
       color: {
-        dark: config.colors.primary,
+        dark: '#000000',
         light: '#ffffff',
       },
       errorCorrectionLevel: 'M',

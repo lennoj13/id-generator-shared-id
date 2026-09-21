@@ -19,7 +19,7 @@ export default function LandingPage() {
         <div className="hero-content">
           <span className="hero-badge">
             <Zap size={14} style={{ marginRight: '4px', verticalAlign: 'middle', marginTop: '-2px' }} />
-            Fake Schedule Generator
+            Academic Schedule & ID Generator
           </span>
           <h1 className="hero-title">
             University Schedule
@@ -28,11 +28,11 @@ export default function LandingPage() {
           </h1>
           <p className="hero-subtitle">
             Select a university template, enter your name, and instantly download
-            a realistic-looking academic schedule and student ID card image.
+            a realistic academic schedule matrix and student ID card image.
           </p>
           <p className="hero-disclaimer">
             <Info size={14} style={{ marginRight: '4px', verticalAlign: 'middle', marginTop: '-2px' }} />
-            For creative inspiration & social media content only — not official documents.
+            For creative inspiration, reference & portfolio demo only — not official documents.
           </p>
         </div>
       </header>
@@ -41,7 +41,7 @@ export default function LandingPage() {
       <section className="template-section">
         <h2 className="section-title">Choose a University Template</h2>
         <p className="section-subtitle">
-          {templateList.length} templates available • More coming soon
+          {templateList.length} templates available • Instant export to JPG & PDF
         </p>
 
         <div className="template-grid">
@@ -84,7 +84,7 @@ export default function LandingPage() {
               </div>
               <h3 className="card-name" style={{ color: '#64748b' }}>More Templates</h3>
               <p className="card-location">Coming Soon</p>
-              <p className="card-tagline">Stanford, Oxford, Yale, and more university templates are on the way.</p>
+              <p className="card-tagline">Princeton, Columbia, Cambridge, and more university templates are on the way.</p>
               <div className="card-stats" style={{ color: '#475569' }}>
                 <span>Stay tuned</span>
               </div>

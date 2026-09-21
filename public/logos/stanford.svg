@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 90" width="400" height="90">
+  <defs>
+    <linearGradient id="treeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#008566" />
+      <stop offset="100%" stop-color="#005A43" />
+    </linearGradient>
+  </defs>
+  <!-- Stanford Block S -->
+  <g transform="translate(10, 5)">
+    <!-- Red Block S -->
+    <path d="M 20 10 L 60 10 L 60 25 L 35 25 L 35 35 L 60 42 L 60 70 L 20 70 L 20 55 L 45 55 L 45 45 L 20 38 Z" fill="#8C1515" />
+    <!-- Stanford Redwood Tree overlay inside S -->
+    <polygon points="40,12 47,26 43,26 49,38 44,38 52,52 42,52 42,66 38,66 38,52 28,52 36,38 31,38 37,26 33,26" fill="url(#treeGrad)" />
+  </g>
+  <!-- Stanford University Typography -->
+  <text x="85" y="45" font-family="'Inter', 'Source Serif Pro', Georgia, serif" font-size="28" font-weight="900" fill="#8C1515" letter-spacing="1">STANFORD</text>
+  <text x="86" y="65" font-family="'Inter', sans-serif" font-size="12" font-weight="700" fill="#2E2D29" letter-spacing="3.5">UNIVERSITY</text>
+</svg>

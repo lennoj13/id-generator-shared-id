@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 90" width="380" height="90">
+  <!-- Berkeley Seal Circle -->
+  <g transform="translate(10, 8)">
+    <circle cx="35" cy="37" r="33" fill="#003262" stroke="#FDB515" stroke-width="2.5" />
+    <circle cx="35" cy="37" r="28" fill="none" stroke="#FDB515" stroke-width="1" stroke-dasharray="2,2" />
+    <!-- Book & Star -->
+    <polygon points="35,16 37,21 42,21 38,24 40,29 35,26 30,29 32,24 28,21 33,21" fill="#FDB515" />
+    <path d="M 22 35 C 28 33, 35 35, 35 35 C 35 35, 42 33, 48 35 L 48 51 C 42 49, 35 51, 35 51 C 35 51, 28 49, 22 51 Z" fill="#ffffff" />
+    <line x1="35" y1="35" x2="35" y2="51" stroke="#003262" stroke-width="1" />
+    <!-- FIAT LUX text curve placeholder -->
+    <text x="35" y="60" font-family="'Inter', sans-serif" font-size="6" font-weight="900" fill="#FDB515" text-anchor="middle" letter-spacing="1">FIAT LUX</text>
+  </g>
+  <!-- Berkeley Typography -->
+  <text x="85" y="44" font-family="'Inter', 'Freight Sans', sans-serif" font-size="30" font-weight="900" fill="#003262" letter-spacing="-0.5">Berkeley</text>
+  <text x="86" y="64" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#FDB515" letter-spacing="1.5">UNIVERSITY OF CALIFORNIA</text>
+</svg>
